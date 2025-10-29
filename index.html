@@ -192,7 +192,7 @@
     
     // Close mobile menu when clicking outside
     document.addEventListener('click', (e) => {
-      if (!mobileMenu.contains(e.target) && !mobileMenuButton.contains(e.target)) {
+      if (mobileMenu && !mobileMenu.contains(e.target) && !mobileMenuButton.contains(e.target)) {
         mobileMenu.classList.add('hidden');
         mobileMenuButton.setAttribute('aria-expanded', 'false');
       }
@@ -714,14 +714,7 @@
     <!-- Decorative elements -->
     <div class="absolute -z-10 top-0 left-0 w-1/3 h-1/3 bg-gradient-to-br from-primary-500/5 to-purple-500/5 rounded-full filter blur-3xl"></div>
     <div class="absolute -z-10 bottom-0 right-0 w-1/2 h-1/2 bg-gradient-to-tr from-blue-500/5 to-cyan-500/5 rounded-full filter blur-3xl"></div>
-          19h-3v-9h3v9zm-1.5-10.29c-.97 0-1.75-.79-1.75-1.75s.78-1.75 
-          1.75-1.75 1.75.78 1.75 1.75-.78 1.75-1.75 
-          1.75zm13.5 10.29h-3v-4.5c0-1.08-.92-2-2-2s-2 
-          .92-2 2v4.5h-3v-9h3v1.31c.53-.83 
-          1.44-1.31 2.44-1.31 1.93 0 3.5 1.57 3.5 
-          3.5v5.5z"/>
-        </svg>
-      </a>
+      
     </div>
   </section>
 
