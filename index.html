@@ -178,6 +178,8 @@
     const prevBtn = document.getElementById('prev-project');
     const nextBtn = document.getElementById('next-project');
     const sliderDots = document.getElementById('slider-dots');
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
     let currentSlide = 0;
     
     // Make these available globally
@@ -282,6 +284,7 @@
     
     // Make updateSlider globally available
     window.updateSlider = updateSlider;
+    window.initSlider = initSlider;
     
     // Initialize the slider when the page loads
     document.addEventListener('DOMContentLoaded', () => {
@@ -1278,9 +1281,11 @@
       `;
       document.head.appendChild(style);
 
-      // Initialize slider
-      renderProjects();
-      initSlider();
+      // Initialize slider (module handles initialization on DOMContentLoaded)
+      if (window.renderProjects) {
+        window.renderProjects();
+      }
+      // initSlider is defined inside module and invoked there after rendering
     });
   </script>
   </body>
