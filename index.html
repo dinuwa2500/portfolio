@@ -171,7 +171,7 @@
   <!-- Project Management Script -->
   <script type="module">
     // Import project management functions
-    import { addProject, updateProject, removeProject, getProject, getAllProjects, renderProjects } from './js/projects.js';
+    import { getProject, getAllProjects, renderFeaturedProjects, openProjectModal } from './js/projects.js';
     
     // Project Slider
     const sliderTrack = document.getElementById('project-slider-track');
@@ -185,7 +185,6 @@
     // Make these available globally
     window.getProject = getProject;
     window.getAllProjects = getAllProjects;
-    window.renderProjects = renderProjects;
     
     // Initialize slider
     function initSlider() {
@@ -286,23 +285,14 @@
     window.updateSlider = updateSlider;
     window.initSlider = initSlider;
     
-    // Initialize the slider when the page loads
+    // Initialize featured projects when the page loads
     document.addEventListener('DOMContentLoaded', () => {
-      // First render the projects
-      if (typeof renderProjects === 'function') {
-        renderProjects();
-      }
-      
-      // Then initialize the slider
-      if (typeof initSlider === 'function') {
-        initSlider();
-      }
+      renderFeaturedProjects();
       
       // If we have projects, update the slider to show the first one
       const projects = getAllProjects();
       if (projects.length > 0) {
-        currentSlide = 0;
-        updateSlider();
+        // no-op: renderFeaturedProjects handles initial slide
       }
     });
     
@@ -527,7 +517,177 @@
       }
     };
     
-    /* Removed legacy slider/modal and duplicate event listeners to avoid conflicts. */
+    // Initialize project slider
+    function initProjectSlider() {
+      // Create dots for project slider
+      sliderDots.innerHTML = '';
+      const projectSlides = document.querySelectorAll('[data-project]');
+      
+      projectSlides.forEach((_, index) => {
+        const dot = document.createElement('button');
+        dot.className = `w-3 h-3 rounded-full ${index === 0 ? 'bg-primary-500' : 'bg-gray-600'}`;
+        dot.addEventListener('click', () => goToSlide(index));
+        sliderDots.appendChild(dot);
+      });
+      
+      // Set initial slide
+      updateSlider();
+    }
+    
+    // Go to specific slide
+    function goToSlide(index) {
+      const projectSlides = document.querySelectorAll('[data-project]');
+      if (index >= 0 && index < projectSlides.length) {
+        currentSlide = index;
+        updateSlider();
+      }
+    }
+    
+    
+    // Open project modal
+    function openProjectModal(projectId) {
+      currentProject = projects.find(p => p.id === projectId);
+      if (!currentProject) return;
+      
+      // Set project details
+      modalProjectTitle.textContent = currentProject.title;
+      modalProjectDescription.textContent = currentProject.description;
+      
+      // Set project tags
+      modalProjectTags.innerHTML = '';
+      currentProject.tags.forEach(tag => {
+        const tagElement = document.createElement('span');
+        tagElement.className = 'skill-tag text-xs px-3 py-1 rounded-full';
+        tagElement.textContent = tag;
+        modalProjectTags.appendChild(tagElement);
+      });
+      
+      // Set project links
+      liveDemoBtn.href = currentProject.demoUrl;
+      viewCodeBtn.href = currentProject.codeUrl;
+      
+      // Load project images
+      loadProjectImages();
+      
+      // Show modal
+      projectModal.classList.remove('invisible', 'opacity-0');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    // Close project modal
+    function closeProjectModal() {
+      projectModal.classList.add('opacity-0', 'invisible');
+      document.body.style.overflow = '';
+      currentImageIndex = 0;
+    }
+    
+    // Load project images into modal
+    function loadProjectImages() {
+      if (!currentProject) return;
+      
+      projectImages.innerHTML = '';
+      imageDots.innerHTML = '';
+      
+      currentProject.images.forEach((image, index) => {
+        // Add image
+        const img = document.createElement('div');
+        img.className = 'w-full h-full flex-shrink-0';
+        img.innerHTML = `<img src="${image}" alt="${currentProject.title} ${index + 1}" class="w-full h-full object-contain">`;
+        projectImages.appendChild(img);
+        
+        // Add dot
+        const dot = document.createElement('button');
+        dot.className = `w-3 h-3 rounded-full ${index === 0 ? 'bg-primary-500' : 'bg-gray-600'}`;
+        dot.addEventListener('click', () => goToImage(index));
+        imageDots.appendChild(dot);
+      });
+      
+      // Reset image index
+      currentImageIndex = 0;
+      updateImageSlider();
+    }
+    
+    // Go to specific image
+    function goToImage(index) {
+      if (index >= 0 && index < currentProject.images.length) {
+        currentImageIndex = index;
+        updateImageSlider();
+      }
+    }
+    
+    // Update image slider position
+    function updateImageSlider() {
+      projectImages.style.transform = `translateX(-${currentImageIndex * 100}%)`;
+      
+      // Update active dot
+      const dots = imageDots.querySelectorAll('button');
+      dots.forEach((dot, index) => {
+        dot.className = `w-3 h-3 rounded-full ${index === currentImageIndex ? 'bg-primary-500' : 'bg-gray-600'}`;
+      });
+    }
+    
+    
+    // Event Listeners
+    if (prevBtn && nextBtn) {
+      prevBtn.addEventListener('click', () => {
+        if (currentSlide > 0) {
+          currentSlide--;
+          updateSlider();
+        }
+      });
+      
+      nextBtn.addEventListener('click', () => {
+        const projectSlides = document.querySelectorAll('[data-project]');
+        if (currentSlide < projectSlides.length - 1) {
+          currentSlide++;
+          updateSlider();
+        }
+      });
+    }
+    
+    if (prevImage && nextImage) {
+      prevImage.addEventListener('click', () => {
+        if (currentImageIndex > 0) {
+          currentImageIndex--;
+          updateImageSlider();
+        }
+      });
+      
+      nextImage.addEventListener('click', () => {
+        if (currentProject && currentImageIndex < currentProject.images.length - 1) {
+          currentImageIndex++;
+          updateImageSlider();
+        }
+      });
+    }
+    
+    if (closeModal) {
+      closeModal.addEventListener('click', closeProjectModal);
+    }
+    
+    // Close modal when clicking outside content
+    projectModal.addEventListener('click', (e) => {
+      if (e.target === projectModal) {
+        closeProjectModal();
+      }
+    });
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !projectModal.classList.contains('invisible')) {
+        closeProjectModal();
+      }
+    });
+    
+    // Initialize slider on window resize
+    window.addEventListener('resize', () => {
+      updateSlider();
+    });
+    
+    // Initialize project slider when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      initProjectSlider();
+    });
     
     mobileMenuButton.addEventListener('click', () => {
       mobileMenu.classList.toggle('hidden');
