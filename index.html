@@ -254,6 +254,31 @@
     });
     
     // Make functions globally available for HTML onclick handlers
+    window.currentProject = null;
+    window.currentImageIndex = 0;
+    
+    function updateImageNavigation() {
+      if (!window.currentProject) return;
+      
+      const projectImages = document.getElementById('project-images');
+      const imageDots = document.getElementById('image-dots');
+      
+      if (!projectImages || !imageDots) return;
+      
+      // Update main image
+      projectImages.innerHTML = `
+        <img src="${window.currentProject.images[window.currentImageIndex]}" 
+             alt="${window.currentProject.title}" 
+             class="w-full h-auto max-h-[60vh] object-contain rounded-lg">
+      `;
+      
+      // Update dots
+      imageDots.innerHTML = window.currentProject.images.map((_, index) => `
+        <button class="w-3 h-3 rounded-full mx-1 transition-all ${index === window.currentImageIndex ? 'bg-primary-500 w-6' : 'bg-gray-600'}"
+                onclick="window.currentImageIndex = ${index}; updateImageNavigation();"></button>
+      `).join('');
+    }
+    
     window.openProjectModal = (projectId) => {
       const project = getProject(projectId);
       if (!project) return;
@@ -261,18 +286,14 @@
       // Project Modal
       const projectModal = document.getElementById('project-modal');
       const closeModal = document.getElementById('close-modal');
-      const projectImages = document.getElementById('project-images');
-      const prevImage = document.getElementById('prev-image');
-      const nextImage = document.getElementById('next-image');
-      const imageDots = document.getElementById('image-dots');
       const modalProjectTitle = document.getElementById('modal-project-title');
       const modalProjectDescription = document.getElementById('modal-project-description');
       const modalProjectTags = document.getElementById('modal-project-tags');
       const liveDemoBtn = document.getElementById('live-demo');
       const viewCodeBtn = document.getElementById('view-code');
       
-      let currentProject = null;
-      let currentImageIndex = 0;
+      window.currentProject = project;
+      window.currentImageIndex = 0;
       
       // Initialize modal with project data
       modalProjectTitle.textContent = project.title;
@@ -300,25 +321,79 @@
         viewCodeBtn.classList.add('opacity-50', 'cursor-not-allowed');
       }
       
-      // Load project images
-      loadProjectImages(project);
+      // Update modal content
+      modalProjectTitle.textContent = project.title;
+      modalProjectDescription.textContent = project.description;
+      
+      // Set up tags
+      modalProjectTags.innerHTML = project.tags.map(tag => 
+        `<span class="inline-block bg-gray-800 text-gray-200 text-xs px-2 py-1 rounded mr-2 mb-2">${tag}</span>`
+      ).join('');
+      
+      // Set up demo and code links
+      if (project.demoUrl && project.demoUrl !== '#') {
+        liveDemoBtn.href = project.demoUrl;
+        liveDemoBtn.target = '_blank';
+        liveDemoBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      } else {
+        liveDemoBtn.href = '#';
+        liveDemoBtn.onclick = (e) => e.preventDefault();
+        liveDemoBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      }
+      
+      if (project.codeUrl && project.codeUrl !== '#') {
+        viewCodeBtn.href = project.codeUrl;
+        viewCodeBtn.target = '_blank';
+        viewCodeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      } else {
+        viewCodeBtn.href = '#';
+        viewCodeBtn.onclick = (e) => e.preventDefault();
+        viewCodeBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      }
+      
+      // Initialize image navigation
+      updateImageNavigation();
       
       // Show the modal
       projectModal.classList.remove('hidden');
       document.body.style.overflow = 'hidden';
       
       // Close modal when clicking the close button or outside the modal
-      closeModal.addEventListener('click', () => {
+      closeModal.onclick = () => {
         projectModal.classList.add('hidden');
         document.body.style.overflow = '';
-      });
+      };
       
-      projectModal.addEventListener('click', (e) => {
+      projectModal.onclick = (e) => {
         if (e.target === projectModal) {
           projectModal.classList.add('hidden');
           document.body.style.overflow = '';
         }
-      });
+      };
+      
+      // Navigation buttons
+      const prevBtn = document.getElementById('prev-image');
+      const nextBtn = document.getElementById('next-image');
+      
+      if (prevBtn) {
+        prevBtn.onclick = (e) => {
+          e.stopPropagation();
+          if (window.currentImageIndex > 0) {
+            window.currentImageIndex--;
+            updateImageNavigation();
+          }
+        };
+      }
+      
+      if (nextBtn) {
+        nextBtn.onclick = (e) => {
+          e.stopPropagation();
+          if (window.currentProject && window.currentImageIndex < window.currentProject.images.length - 1) {
+            window.currentImageIndex++;
+            updateImageNavigation();
+          }
+        };
+      }
     };
     
     // Initialize project slider

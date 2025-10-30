@@ -1,5 +1,8 @@
 // projects.js - Centralized project management for your portfolio
 
+// Global variables
+let currentSlide = 0;
+
 // Project data structure
 export const projects = [
   {
@@ -150,6 +153,9 @@ export function renderProjects() {
     initSlider();
   }
 }
+
+// Make renderProjects globally available
+window.renderProjects = renderProjects;
 
 // Initialize the projects when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
