@@ -12,8 +12,8 @@ export const projects = [
     tags: ['React', 'Node.js', 'MongoDB', 'Tailwind CSS'],
     images: [
       'https://res.cloudinary.com/dinuwapvt/image/upload/v1745607664/tickets/something_lost_1745607662986_sv3sh2.png',
-      'https://via.placeholder.com/1200x800/1e293b/2dd4bf?text=Project+1+Screen+2',
-      'https://via.placeholder.com/1200x800/1e293b/2dd4bf?text=Project+1+Screen+3'
+      'https://res.cloudinary.com/dinuwapvt/image/upload/v1745607664/tickets/something_lost_1745607662986_sv3sh2.png',
+      'https://res.cloudinary.com/dinuwapvt/image/upload/v1745607664/tickets/something_lost_1745607662986_sv3sh2.png'
     ],
     demoUrl: '#',
     codeUrl: '#'
@@ -24,9 +24,9 @@ export const projects = [
     description: 'A brief description of Project 2 and its key features. This project demonstrates my ability to create responsive and interactive web applications.',
     tags: ['Vue.js', 'Express', 'PostgreSQL', 'Tailwind CSS'],
     images: [
-      'https://via.placeholder.com/1200x800/1e293b/2dd4bf?text=Project+2+Screen+1',
-      'https://via.placeholder.com/1200x800/1e293b/2dd4bf?text=Project+2+Screen+2',
-      'https://via.placeholder.com/1200x800/1e293b/2dd4bf?text=Project+2+Screen+3'
+      'https://res.cloudinary.com/dinuwapvt/image/upload/v1745607664/tickets/something_lost_1745607662986_sv3sh2.png',
+      'https://res.cloudinary.com/dinuwapvt/image/upload/v1745607664/tickets/something_lost_1745607662986_sv3sh2.png',
+      'https://res.cloudinary.com/dinuwapvt/image/upload/v1745607664/tickets/something_lost_1745607662986_sv3sh2.png'
     ],
     demoUrl: '#',
     codeUrl: '#'
@@ -38,9 +38,9 @@ export const projects = [
     description: 'A brief description of Project 2 and its key features. This project demonstrates my ability to create responsive and interactive web applications.',
     tags: ['Vue.js', 'Express', 'PostgreSQL', 'Tailwind CSS'],
     images: [
-      'https://via.placeholder.com/1200x800/1e293b/2dd4bf?text=Project+2+Screen+1',
-      'https://via.placeholder.com/1200x800/1e293b/2dd4bf?text=Project+2+Screen+2',
-      'https://via.placeholder.com/1200x800/1e293b/2dd4bf?text=Project+2+Screen+3'
+      'https://res.cloudinary.com/dinuwapvt/image/upload/v1745607664/tickets/something_lost_1745607662986_sv3sh2.png',
+      'https://res.cloudinary.com/dinuwapvt/image/upload/v1745607664/tickets/something_lost_1745607662986_sv3sh2.png',
+      'https://res.cloudinary.com/dinuwapvt/image/upload/v1745607664/tickets/something_lost_1745607662986_sv3sh2.png'
     ],
     demoUrl: '#',
     codeUrl: '#'
