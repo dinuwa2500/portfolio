@@ -72,9 +72,11 @@ export function initFeaturedProjects() {
 
   list.forEach((project, index) => {
     const slide = document.createElement("div");
-    slide.className = "project-slide w-full flex-shrink-0 px-4";
+    // One slide per viewport
+    slide.className = "project-slide min-w-full flex-shrink-0";
     slide.dataset.project = String(project.id);
     slide.innerHTML = `
+      <div class="px-4">
       <div class="card p-6 rounded-xl group cursor-pointer h-full bg-dark-800/70 border border-dark-700/40 hover:border-primary-500/40 transition-colors">
         <div class="relative overflow-hidden rounded-lg mb-4 h-64 md:h-72 lg:h-80">
           <img src="${
@@ -101,12 +103,13 @@ export function initFeaturedProjects() {
             .join("")}
           ${
             project.tags && project.tags.length > 3
-              ? `<span class='text-xs px-2 py-1 bg-dark-700 text-gray-500 rounded'>+$${
+              ? `<span class='text-xs px-2 py-1 bg-dark-700 text-gray-500 rounded'>+${
                   project.tags.length - 3
                 } more</span>`
               : ""
           }
         </div>
+      </div>
       </div>
     `;
 
@@ -139,7 +142,7 @@ export function initFeaturedProjects() {
   const update = () => {
     const total = list.length;
     if (total === 0) return;
-    const translateX = -(currentSlide * (100 / total));
+    const translateX = -(currentSlide * 100);
     track.style.transition = "transform 0.3s ease-in-out";
     track.style.transform = `translateX(${translateX}%)`;
 
