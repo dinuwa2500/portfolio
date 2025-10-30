@@ -11,7 +11,7 @@ export const projects = [
     description: 'A brief description of Project 1 and its key features. This project showcases my skills in web development and design.',
     tags: ['React', 'Node.js', 'MongoDB', 'Tailwind CSS'],
     images: [
-      'https://via.placeholder.com/1200x800/1e293b/2dd4bf?text=Project+1+Screen+1',
+      'https://res.cloudinary.com/dinuwapvt/image/upload/v1745607664/tickets/something_lost_1745607662986_sv3sh2.png',
       'https://via.placeholder.com/1200x800/1e293b/2dd4bf?text=Project+1+Screen+2',
       'https://via.placeholder.com/1200x800/1e293b/2dd4bf?text=Project+1+Screen+3'
     ],
@@ -32,6 +32,19 @@ export const projects = [
     codeUrl: '#'
   }
   // Add more projects here as you complete them
+   {
+    id: 3,
+    title: 'Project 3',
+    description: 'A brief description of Project 2 and its key features. This project demonstrates my ability to create responsive and interactive web applications.',
+    tags: ['Vue.js', 'Express', 'PostgreSQL', 'Tailwind CSS'],
+    images: [
+      'https://via.placeholder.com/1200x800/1e293b/2dd4bf?text=Project+2+Screen+1',
+      'https://via.placeholder.com/1200x800/1e293b/2dd4bf?text=Project+2+Screen+2',
+      'https://via.placeholder.com/1200x800/1e293b/2dd4bf?text=Project+2+Screen+3'
+    ],
+    demoUrl: '#',
+    codeUrl: '#'
+  }
 ];
 
 // Function to add a new project
