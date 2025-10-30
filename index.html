@@ -289,11 +289,89 @@
       const modalProjectTitle = document.getElementById('modal-project-title');
       const modalProjectDescription = document.getElementById('modal-project-description');
       const modalProjectTags = document.getElementById('modal-project-tags');
+      const projectImages = document.getElementById('project-images');
       const liveDemoBtn = document.getElementById('live-demo');
       const viewCodeBtn = document.getElementById('view-code');
       
       window.currentProject = project;
       window.currentImageIndex = 0;
+      
+      // Clear previous images and add new ones
+      projectImages.innerHTML = '';
+      
+      if (project.images && project.images.length > 0) {
+        // Add images to the slider
+        project.images.forEach((image, index) => {
+          const img = document.createElement('img');
+          img.src = image;
+          img.alt = `${project.title} - Image ${index + 1}`;
+          img.className = `w-full h-64 md:h-80 object-cover rounded-lg ${index === 0 ? 'block' : 'hidden'}`;
+          img.id = `project-image-${index}`;
+          projectImages.appendChild(img);
+        });
+        
+        // Add navigation buttons if there are multiple images
+        if (project.images.length > 1) {
+          // Previous button
+          const prevBtn = document.createElement('button');
+          prevBtn.innerHTML = '&larr;';
+          prevBtn.className = 'absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/75';
+          prevBtn.onclick = (e) => {
+            e.stopPropagation();
+            showImage((window.currentImageIndex - 1 + project.images.length) % project.images.length);
+          };
+          projectImages.appendChild(prevBtn);
+          
+          // Next button
+          const nextBtn = document.createElement('button');
+          nextBtn.innerHTML = '&rarr;';
+          nextBtn.className = 'absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/75';
+          nextBtn.onclick = (e) => {
+            e.stopPropagation();
+            showImage((window.currentImageIndex + 1) % project.images.length);
+          };
+          projectImages.appendChild(nextBtn);
+          
+          // Image indicators
+          const indicators = document.createElement('div');
+          indicators.className = 'flex justify-center mt-2 space-x-2';
+          project.images.forEach((_, index) => {
+            const indicator = document.createElement('button');
+            indicator.className = `w-2 h-2 rounded-full ${index === 0 ? 'bg-white' : 'bg-gray-500'}`;
+            indicator.onclick = (e) => {
+              e.stopPropagation();
+              showImage(index);
+            };
+            indicators.appendChild(indicator);
+          });
+          projectImages.appendChild(indicators);
+        }
+        
+        // Function to show specific image
+        window.showImage = (index) => {
+          // Hide current image
+          const currentImage = document.getElementById(`project-image-${window.currentImageIndex}`);
+          if (currentImage) currentImage.classList.add('hidden');
+          
+          // Show new image
+          window.currentImageIndex = index;
+          const newImage = document.getElementById(`project-image-${index}`);
+          if (newImage) newImage.classList.remove('hidden');
+          
+          // Update indicators
+          const indicators = projectImages.querySelectorAll('.flex.justify-center button');
+          indicators.forEach((ind, i) => {
+            ind.className = `w-2 h-2 rounded-full ${i === index ? 'bg-white' : 'bg-gray-500'}`;
+          });
+        };
+      } else {
+        // If no images, show a placeholder
+        projectImages.innerHTML = `
+          <div class="bg-gray-700 h-64 md:h-80 rounded-lg flex items-center justify-center text-gray-400">
+            No images available
+          </div>
+        `;
+      }
       
       // Initialize modal with project data
       modalProjectTitle.textContent = project.title;
