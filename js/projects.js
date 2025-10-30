@@ -30,7 +30,7 @@ export const projects = [
     ],
     demoUrl: '#',
     codeUrl: '#'
-  }
+  },
   // Add more projects here as you complete them
    {
     id: 3,
