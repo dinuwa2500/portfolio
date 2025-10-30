@@ -4,28 +4,29 @@
 export const projects = [
   {
     id: 1,
-    title: 'Project 1',
-    description: 'A brief description of Project 1 showcasing key features and impact.',
-    tags: ['React', 'Node.js', 'Tailwind'],
+    title: "Project 1",
+    description:
+      "A brief description of Project 1 showcasing key features and impact.",
+    tags: ["React", "Node.js", "Tailwind"],
     images: [
-      'https://via.placeholder.com/1200x720/0b132b/e0fbfc?text=Project+1+Cover',
-      'https://via.placeholder.com/1200x720/1c2541/e0fbfc?text=Project+1+Screen+2',
-      'https://via.placeholder.com/1200x720/3a506b/e0fbfc?text=Project+1+Screen+3',
+      "https://res.cloudinary.com/dinuwapvt/image/upload/v1761806358/Lucid_Origin_A_vibrant_2D_cartoon_mascot_character_in_the_styl_3_fpdkfw.jpg",
+      "https://res.cloudinary.com/dinuwapvt/image/upload/v1761806358/Lucid_Origin_A_vibrant_2D_cartoon_mascot_character_in_the_styl_3_fpdkfw.jpg",
+      "https://res.cloudinary.com/dinuwapvt/image/upload/v1761806358/Lucid_Origin_A_vibrant_2D_cartoon_mascot_character_in_the_styl_3_fpdkfw.jpg",
     ],
-    demoUrl: '#',
-    codeUrl: '#',
+    demoUrl: "#",
+    codeUrl: "#",
   },
   {
     id: 2,
-    title: 'Project 2',
-    description: 'An elegant, responsive web app demonstrating great UX.',
-    tags: ['Vue', 'Express', 'Postgres'],
+    title: "Project 2",
+    description: "An elegant, responsive web app demonstrating great UX.",
+    tags: ["Vue", "Express", "Postgres"],
     images: [
-      'https://via.placeholder.com/1200x720/003049/e0fbfc?text=Project+2+Cover',
-      'https://via.placeholder.com/1200x720/d62828/e0fbfc?text=Project+2+Screen+2'
+      "https://res.cloudinary.com/dinuwapvt/image/upload/v1761806358/Lucid_Origin_A_vibrant_2D_cartoon_mascot_character_in_the_styl_3_fpdkfw.jpg",
+      "https://res.cloudinary.com/dinuwapvt/image/upload/v1761806358/Lucid_Origin_A_vibrant_2D_cartoon_mascot_character_in_the_styl_3_fpdkfw.jpg",
     ],
-    demoUrl: '#',
-    codeUrl: '#',
+    demoUrl: "#",
+    codeUrl: "#",
   },
 ];
 
@@ -134,6 +135,7 @@ export function openProjectModal(projectId) {
 
   const modal = document.getElementById('project-modal');
   const closeBtn = document.getElementById('close-modal');
+  const overlay = document.getElementById('modal-overlay');
   const titleEl = document.getElementById('modal-project-title');
   const descEl = document.getElementById('modal-project-description');
   const tagsEl = document.getElementById('modal-project-tags');
@@ -248,6 +250,7 @@ export function openProjectModal(projectId) {
   };
 
   if (closeBtn) closeBtn.onclick = close;
+  if (overlay) overlay.onclick = close;
   modal.onclick = (e) => { if (e.target === modal) close(); };
   document.addEventListener('keydown', keyHandler);
 }
