@@ -185,6 +185,10 @@
       const projects = getAllProjects();
       if (!projects.length) return;
       
+      // Get navigation buttons
+      const prevBtn = document.getElementById('prev-project');
+      const nextBtn = document.getElementById('next-project');
+      
       // Set slider track width
       sliderTrack.style.width = `${projects.length * 100}%`;
       
@@ -200,7 +204,6 @@
       
       if (nextBtn) {
         nextBtn.addEventListener('click', () => {
-          const projects = getAllProjects();
           if (currentSlide < projects.length - 1) {
             currentSlide++;
             updateSlider();
@@ -208,12 +211,13 @@
         });
       }
       
-      // Create dots
+      // Add dots for navigation
       if (sliderDots) {
         sliderDots.innerHTML = '';
         projects.forEach((_, index) => {
           const dot = document.createElement('button');
           dot.className = `w-3 h-3 rounded-full mx-1 transition-all ${index === 0 ? 'bg-primary-500 w-6' : 'bg-gray-600'}`;
+          dot.ariaLabel = `Go to slide ${index + 1}`;
           dot.addEventListener('click', () => {
             currentSlide = index;
             updateSlider();
@@ -228,9 +232,15 @@
     function updateSlider() {
       if (!sliderTrack) return;
       const projects = getAllProjects();
+      if (!projects.length) return;
+      
+      // Calculate the translateX value
       const slideWidth = 100 / projects.length;
-      sliderTrack.style.width = `${projects.length * 100}%`;
-      sliderTrack.style.transform = `translateX(-${currentSlide * (100 / projects.length)}%)`;
+      const translateX = -currentSlide * slideWidth;
+      
+      // Apply the transform with smooth transition
+      sliderTrack.style.transition = 'transform 0.3s ease-in-out';
+      sliderTrack.style.transform = `translateX(${translateX}%)`;
       
       // Update active dot
       if (sliderDots) {
@@ -244,6 +254,22 @@
             dot.classList.add('bg-gray-600', 'w-3');
           }
         });
+      }
+      
+      // Update button states
+      const prevBtn = document.getElementById('prev-project');
+      const nextBtn = document.getElementById('next-project');
+      
+      if (prevBtn) {
+        prevBtn.disabled = currentSlide === 0;
+        prevBtn.classList.toggle('opacity-50', currentSlide === 0);
+        prevBtn.classList.toggle('cursor-not-allowed', currentSlide === 0);
+      }
+      
+      if (nextBtn) {
+        nextBtn.disabled = currentSlide === projects.length - 1;
+        nextBtn.classList.toggle('opacity-50', currentSlide === projects.length - 1);
+        nextBtn.classList.toggle('cursor-not-allowed', currentSlide === projects.length - 1);
       }
     }
     
@@ -581,6 +607,34 @@
       dots.forEach((dot, index) => {
         dot.className = `w-3 h-3 rounded-full ${index === currentImageIndex ? 'bg-primary-500' : 'bg-gray-600'}`;
       });
+    }
+    
+    // Update slider position with smooth transition
+    function updateSlider() {
+      sliderTrack.style.transition = 'transform 0.3s ease-in-out';
+      sliderTrack.style.transform = `translateX(${translateX}%)`;
+      
+      // Update active dot
+      const dots = document.querySelectorAll('#slider-dots button');
+      dots.forEach((dot, index) => {
+        dot.className = `w-3 h-3 rounded-full mx-1 transition-all ${index === currentSlide ? 'bg-primary-500 w-6' : 'bg-gray-600'}`;
+      });
+      
+      // Update button states
+      const prevBtn = document.getElementById('prev-project');
+      const nextBtn = document.getElementById('next-project');
+      
+      if (prevBtn) {
+        prevBtn.disabled = currentSlide === 0;
+        prevBtn.classList.toggle('opacity-50', currentSlide === 0);
+        prevBtn.classList.toggle('cursor-not-allowed', currentSlide === 0);
+      }
+      
+      if (nextBtn) {
+        nextBtn.disabled = currentSlide === projects.length - 1;
+        nextBtn.classList.toggle('opacity-50', currentSlide === projects.length - 1);
+        nextBtn.classList.toggle('cursor-not-allowed', currentSlide === projects.length - 1);
+      }
     }
     
     // Event Listeners
