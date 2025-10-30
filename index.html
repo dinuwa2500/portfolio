@@ -180,6 +180,11 @@
     const sliderDots = document.getElementById('slider-dots');
     let currentSlide = 0;
     
+    // Make these available globally
+    window.getProject = getProject;
+    window.getAllProjects = getAllProjects;
+    window.renderProjects = renderProjects;
+    
     // Initialize slider
     function initSlider() {
       const projects = getAllProjects();
@@ -190,7 +195,9 @@
       const nextBtn = document.getElementById('next-project');
       
       // Set slider track width
-      sliderTrack.style.width = `${projects.length * 100}%`;
+      if (sliderTrack) {
+        sliderTrack.style.width = `${projects.length * 100}%`;
+      }
       
       // Add event listeners for navigation
       if (prevBtn) {
@@ -273,10 +280,27 @@
       }
     }
     
-    // Initialize slider when the page loads
+    // Make updateSlider globally available
+    window.updateSlider = updateSlider;
+    
+    // Initialize the slider when the page loads
     document.addEventListener('DOMContentLoaded', () => {
-      renderProjects();
-      initSlider();
+      // First render the projects
+      if (typeof renderProjects === 'function') {
+        renderProjects();
+      }
+      
+      // Then initialize the slider
+      if (typeof initSlider === 'function') {
+        initSlider();
+      }
+      
+      // If we have projects, update the slider to show the first one
+      const projects = getAllProjects();
+      if (projects.length > 0) {
+        currentSlide = 0;
+        updateSlider();
+      }
     });
     
     // Make functions globally available for HTML onclick handlers
@@ -609,33 +633,6 @@
       });
     }
     
-    // Update slider position with smooth transition
-    function updateSlider() {
-      sliderTrack.style.transition = 'transform 0.3s ease-in-out';
-      sliderTrack.style.transform = `translateX(${translateX}%)`;
-      
-      // Update active dot
-      const dots = document.querySelectorAll('#slider-dots button');
-      dots.forEach((dot, index) => {
-        dot.className = `w-3 h-3 rounded-full mx-1 transition-all ${index === currentSlide ? 'bg-primary-500 w-6' : 'bg-gray-600'}`;
-      });
-      
-      // Update button states
-      const prevBtn = document.getElementById('prev-project');
-      const nextBtn = document.getElementById('next-project');
-      
-      if (prevBtn) {
-        prevBtn.disabled = currentSlide === 0;
-        prevBtn.classList.toggle('opacity-50', currentSlide === 0);
-        prevBtn.classList.toggle('cursor-not-allowed', currentSlide === 0);
-      }
-      
-      if (nextBtn) {
-        nextBtn.disabled = currentSlide === projects.length - 1;
-        nextBtn.classList.toggle('opacity-50', currentSlide === projects.length - 1);
-        nextBtn.classList.toggle('cursor-not-allowed', currentSlide === projects.length - 1);
-      }
-    }
     
     // Event Listeners
     if (prevBtn && nextBtn) {

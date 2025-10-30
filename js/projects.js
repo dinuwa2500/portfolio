@@ -190,10 +190,79 @@ export function renderProjects() {
   }
 }
 
+// Export renderProjects function
+export function renderProjects() {
+  const projects = getAllProjects();
+  const sliderTrack = document.getElementById('project-slider-track');
+  const sliderDots = document.getElementById('slider-dots');
+  
+  if (!sliderTrack || !sliderDots) return;
+
+  // Clear existing content
+  sliderTrack.innerHTML = '';
+  sliderDots.innerHTML = '';
+
+  // Add projects to slider
+  projects.forEach((project, index) => {
+    // Create project card
+    const projectCard = document.createElement('div');
+    projectCard.className = 'project-slide w-full flex-shrink-0 px-4';
+    projectCard.style.width = '100%';
+    projectCard.dataset.project = project.id;
+
+    projectCard.innerHTML = `
+      <div class="card p-6 rounded-lg group cursor-pointer h-full">
+        <div class="relative overflow-hidden rounded-lg mb-4 h-48">
+          <img src="${project.images[0] || 'https://via.placeholder.com/800x500/1e293b/2dd4bf?text=Project+Image'}" 
+               alt="${project.title}" 
+               class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+            <button class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-md transition-colors"
+                    onclick="event.stopPropagation(); window.openProjectModal(${project.id})">
+              View Details
+            </button>
+          </div>
+        </div>
+        <h3 class="text-xl font-semibold text-white mb-2">${project.title}</h3>
+        <p class="text-gray-400 text-sm mb-4 line-clamp-2">${project.description}</p>
+        <div class="flex flex-wrap gap-2">
+          ${project.tags.slice(0, 3).map(tag => `
+            <span class="text-xs px-2 py-1 bg-dark-700 text-gray-300 rounded">${tag}</span>
+          `).join('')}
+          ${project.tags.length > 3 ? `<span class="text-xs px-2 py-1 bg-dark-700 text-gray-500 rounded">+${project.tags.length - 3} more</span>` : ''}
+        </div>
+      </div>
+    `;
+
+    // Add click handler to the entire card
+    projectCard.addEventListener('click', (e) => {
+      // Only trigger if the click wasn't on a button or link
+      if (!e.target.closest('button, a')) {
+        if (window.openProjectModal) {
+          window.openProjectModal(project.id);
+        }
+      }
+    });
+
+    sliderTrack.appendChild(projectCard);
+
+    // Create dot for this project
+    const dot = document.createElement('button');
+    dot.className = `w-3 h-3 rounded-full mx-1 transition-all ${index === 0 ? 'bg-primary-500 w-6' : 'bg-gray-600'}`;
+    dot.ariaLabel = `Go to slide ${index + 1}`;
+    dot.addEventListener('click', (e) => {
+      e.stopPropagation();
+      currentSlide = index;
+      updateSlider();
+    });
+    sliderDots.appendChild(dot);
+  });
+
+  // Initialize or update slider after projects are rendered
+  if (typeof initSlider === 'function') {
+    initSlider();
+  }
+}
+
 // Make renderProjects globally available
 window.renderProjects = renderProjects;
-
-// Initialize the projects when the DOM is loaded
-document.addEventListener("DOMContentLoaded", () => {
-  renderProjects();
-});
