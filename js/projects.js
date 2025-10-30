@@ -120,9 +120,9 @@ export function renderFeaturedProjects() {
     slide.innerHTML = `
       <div class="card p-6 rounded-lg group cursor-pointer h-full">
         <div class="relative overflow-hidden rounded-lg mb-4 h-48">
-          <img src="${project.images?.[0] || 'https://via.placeholder.com/800x500/1e293b/2dd4bf?text=Project+Image'}" alt="${project.title}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+          <img src="${project.images?.[0] || 'https://via.placeholder.com/800x500/1e293b/2dd4bf?text=Project+Image'}" alt="${project.title}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" decoding="async" />
           <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-            <button class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-md transition-colors view-details">View Details</button>
+            <button class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-md transition-colors view-details" type="button" aria-label="View project details">View Details</button>
           </div>
         </div>
         <h3 class="text-xl font-semibold text-white mb-2">${project.title}</h3>
@@ -206,6 +206,12 @@ export function openProjectModal(projectId) {
 
   if (!modal || !titleEl || !descEl || !tagsEl || !imagesEl) return;
 
+  // A11y attributes
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('aria-labelledby', 'modal-project-title');
+  modal.setAttribute('aria-hidden', 'false');
+
   titleEl.textContent = project.title;
   descEl.textContent = project.description;
   tagsEl.innerHTML = (project.tags||[]).map(t=>`<span class="inline-block bg-gray-800 text-gray-200 text-xs px-2 py-1 rounded mr-2 mb-2">${t}</span>`).join('');
@@ -229,6 +235,8 @@ export function openProjectModal(projectId) {
       const img = document.createElement('img');
       img.src = src;
       img.alt = `${project.title} - Image ${i+1}`;
+      img.loading = 'lazy';
+      img.decoding = 'async';
       img.className = `w-full h-64 md:h-80 object-contain rounded-lg ${i === imgIndex ? 'block' : 'hidden'}`;
       imagesEl.appendChild(img);
     });
@@ -247,25 +255,73 @@ export function openProjectModal(projectId) {
   renderImages();
   updateIndicators();
 
-  // Prev/Next buttons
+  // Prev/Next helpers and buttons
+  const goPrev = () => { imgIndex = (imgIndex - 1 + (project.images?.length||1)) % (project.images?.length||1); renderImages(); updateIndicators(); };
+  const goNext = () => { imgIndex = (imgIndex + 1) % (project.images?.length||1); renderImages(); updateIndicators(); };
+
   const prevBtn = document.createElement('button');
+  prevBtn.type = 'button';
+  prevBtn.setAttribute('aria-label', 'Previous image');
   prevBtn.innerHTML = '&larr;';
-  prevBtn.className = 'absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/75';
-  prevBtn.onclick = (e) => { e.stopPropagation(); imgIndex = (imgIndex - 1 + (project.images?.length||1)) % (project.images?.length||1); renderImages(); updateIndicators(); };
+  prevBtn.className = 'absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/75 focus:outline-none focus:ring-2 focus:ring-white/60';
+  prevBtn.onclick = (e) => { e.stopPropagation(); goPrev(); };
   const nextBtn = document.createElement('button');
+  nextBtn.type = 'button';
+  nextBtn.setAttribute('aria-label', 'Next image');
   nextBtn.innerHTML = '&rarr;';
-  nextBtn.className = 'absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/75';
-  nextBtn.onclick = (e) => { e.stopPropagation(); imgIndex = (imgIndex + 1) % (project.images?.length||1); renderImages(); updateIndicators(); };
+  nextBtn.className = 'absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/75 focus:outline-none focus:ring-2 focus:ring-white/60';
+  nextBtn.onclick = (e) => { e.stopPropagation(); goNext(); };
 
   imagesEl.appendChild(prevBtn);
   imagesEl.appendChild(nextBtn);
   imagesEl.appendChild(indicators);
 
+  // Show modal
+  const previouslyFocused = document.activeElement;
   modal.classList.remove('hidden');
   document.body.style.overflow = 'hidden';
 
-  const close = () => { modal.classList.add('hidden'); document.body.style.overflow = ''; };
+  // Focus trap
+  const getFocusable = () => Array.from(modal.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'));
+  const focusables = getFocusable();
+  const first = focusables[0] || closeBtn || modal;
+  const last = focusables[focusables.length - 1] || closeBtn || modal;
+  setTimeout(() => { (closeBtn || first).focus?.(); }, 0);
+
+  const close = () => {
+    modal.classList.add('hidden');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    document.removeEventListener('keydown', keyHandler);
+    if (previouslyFocused && typeof previouslyFocused.focus === 'function') {
+      previouslyFocused.focus();
+    }
+  };
+
   if (closeBtn) closeBtn.onclick = close;
   modal.onclick = (e) => { if (e.target === modal) close(); };
-  document.addEventListener('keydown', function esc(e){ if (e.key==='Escape'){ close(); document.removeEventListener('keydown', esc);} });
+
+  const keyHandler = (e) => {
+    if (e.key === 'Escape') { e.preventDefault(); close(); return; }
+    if (e.key === 'ArrowRight') { e.preventDefault(); goNext(); return; }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); goPrev(); return; }
+    if (e.key === 'Tab') {
+      const f = getFocusable();
+      if (f.length === 0) { e.preventDefault(); return; }
+      const firstEl = f[0];
+      const lastEl = f[f.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === firstEl || document.activeElement === modal) {
+          e.preventDefault();
+          lastEl.focus();
+        }
+      } else {
+        if (document.activeElement === lastEl) {
+          e.preventDefault();
+          firstEl.focus();
+        }
+      }
+    }
+  };
+  document.addEventListener('keydown', keyHandler);
 }
