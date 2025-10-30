@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Projects - Portfolio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            'sans': ['Inter', 'sans-serif'],
+            'mono': ['Fira Code', 'monospace']
+          },
+          colors: {
+            primary: {
+              500: '#14b8a6',
+              600: '#0d9488',
+              700: '#0f766e',
+            },
+            dark: {
+              700: '#262626',
+              800: '#1a1a1a',
+              900: '#0a0a0a',
+            },
+          },
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #0a0a0a;
+      color: #f8fafc;
+      font-family: 'Inter', sans-serif;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .skill-tag {
+      background: rgba(20, 184, 166, 0.1);
+      border: 1px solid rgba(20, 184, 166, 0.2);
+    }
+  </style>
+</head>
+<body class="min-h-screen p-6">
+  <div class="max-w-7xl mx-auto">
+    <header class="mb-12">
+      <h1 class="text-3xl font-bold mb-2">Manage Projects</h1>
+      <p class="text-gray-400">Add, edit, or remove projects from your portfolio</p>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Project Form -->
+      <div class="lg:col-span-2 space-y-6">
+        <div class="card p-6 rounded-xl">
+          <h2 class="text-xl font-bold mb-6">Add/Edit Project</h2>
+          
+          <form id="project-form" class="space-y-6">
+            <input type="hidden" id="project-id">
+            
+            <div>
+              <label for="project-title" class="block text-sm font-medium text-gray-300 mb-1">Project Title</label>
+              <input type="text" id="project-title" required
+                class="w-full px-4 py-2 bg-dark-700 border border-gray-700 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+            </div>
+            
+            <div>
+              <label for="project-description" class="block text-sm font-medium text-gray-300 mb-1">Description</label>
+              <textarea id="project-description" rows="3" required
+                class="w-full px-4 py-2 bg-dark-700 border border-gray-700 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"></textarea>
+            </div>
+            
+            <div>
+              <label for="project-tags" class="block text-sm font-medium text-gray-300 mb-1">Technologies (comma separated)</label>
+              <input type="text" id="project-tags" placeholder="React, Node.js, MongoDB"
+                class="w-full px-4 py-2 bg-dark-700 border border-gray-700 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-1">Project Images</label>
+              <div id="image-inputs" class="space-y-2">
+                <!-- Image URLs will be added here -->
+              </div>
+              <button type="button" onclick="addImageInput()"
+                class="mt-2 px-4 py-2 text-sm bg-dark-700 text-white rounded-md hover:bg-dark-600 transition-colors">
+                + Add Image URL
+              </button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label for="demo-url" class="block text-sm font-medium text-gray-300 mb-1">Live Demo URL</label>
+                <input type="url" id="demo-url"
+                  class="w-full px-4 py-2 bg-dark-700 border border-gray-700 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+              </div>
+              
+              <div>
+                <label for="code-url" class="block text-sm font-medium text-gray-300 mb-1">Source Code URL</label>
+                <input type="url" id="code-url"
+                  class="w-full px-4 py-2 bg-dark-700 border border-gray-700 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+              </div>
+            </div>
+            
+            <div class="flex justify-end space-x-4 pt-4">
+              <button type="button" id="cancel-edit" class="px-4 py-2 text-gray-300 hover:text-white transition-colors hidden">
+                Cancel
+              </button>
+              <button type="submit" class="px-6 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors">
+                Save Project
+              </button>
+            </div>
+          </form>
+        </div>
+        
+        <!-- Projects List -->
+        <div class="card p-6 rounded-xl">
+          <h2 class="text-xl font-bold mb-6">Your Projects</h2>
+          <div id="projects-list" class="space-y-4">
+            <!-- Projects will be listed here -->
+          </div>
+        </div>
+      </div>
+      
+      <!-- Preview -->
+      <div class="lg:col-span-1">
+        <div class="card p-6 rounded-xl sticky top-6">
+          <h2 class="text-xl font-bold mb-6">Preview</h2>
+          <div id="project-preview" class="space-y-4">
+            <div class="bg-dark-800 p-4 rounded-lg text-center text-gray-400">
+              Project preview will appear here
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Sample projects data (in a real app, this would come from a database)
+    let projects = JSON.parse(localStorage.getItem('portfolio-projects') || '[]');
+    
+    // DOM Elements
+    const projectForm = document.getElementById('project-form');
+    const projectsList = document.getElementById('projects-list');
+    const projectPreview = document.getElementById('project-preview');
+    const cancelEditBtn = document.getElementById('cancel-edit');
+    let currentProjectId = null;
+
+    // Initialize the page
+    function init() {
+      renderProjectsList();
+      setupEventListeners();
+      addImageInput(); // Add one image input by default
+    }
+
+    // Set up event listeners
+    function setupEventListeners() {
+      // Form submission
+      projectForm.addEventListener('submit', handleFormSubmit);
+      
+      // Cancel edit
+      if (cancelEditBtn) {
+        cancelEditBtn.addEventListener('click', resetForm);
+      }
+      
+      // Live preview updates
+      document.getElementById('project-title')?.addEventListener('input', updatePreview);
+      document.getElementById('project-description')?.addEventListener('input', updatePreview);
+      document.getElementById('project-tags')?.addEventListener('input', updatePreview);
+    }
+
+    // Handle form submission
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      
+      const title = document.getElementById('project-title').value.trim();
+      const description = document.getElementById('project-description').value.trim();
+      const tags = document.getElementById('project-tags').value
+        .split(',')
+        .map(tag => tag.trim())
+        .filter(tag => tag !== '');
+      
+      const imageInputs = document.querySelectorAll('.image-url');
+      const images = Array.from(imageInputs)
+        .map(input => input.value.trim())
+        .filter(url => url !== '');
+      
+      const demoUrl = document.getElementById('demo-url').value.trim();
+      const codeUrl = document.getElementById('code-url').value.trim();
+      
+      if (!title || !description || images.length === 0) {
+        alert('Please fill in all required fields');
+        return;
+      }
+      
+      const projectData = {
+        id: currentProjectId || Date.now().toString(),
+        title,
+        description,
+        tags,
+        images,
+        demoUrl: demoUrl || '#',
+        codeUrl: codeUrl || '#',
+        featured: true
+      };
+      
+      // Update or add project
+      if (currentProjectId) {
+        const index = projects.findIndex(p => p.id === currentProjectId);
+        if (index !== -1) {
+          projects[index] = projectData;
+        }
+      } else {
+        projects.unshift(projectData);
+      }
+      
+      // Save to localStorage
+      localStorage.setItem('portfolio-projects', JSON.stringify(projects));
+      
+      // Reset form and update UI
+      resetForm();
+      renderProjectsList();
+      updatePreview();
+    }
+    
+    // Add a new image URL input
+    function addImageInput(value = '') {
+      const container = document.getElementById('image-inputs');
+      const id = `image-${Date.now()}`;
+      
+      const div = document.createElement('div');
+      div.className = 'flex space-x-2';
+      div.innerHTML = `
+        <input type="url" 
+               class="image-url flex-1 px-3 py-1.5 bg-dark-700 border border-gray-700 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent" 
+               placeholder="https://example.com/image.jpg" 
+               value="${value}"
+               oninput="updatePreview()">
+        <button type="button" 
+                class="px-3 bg-red-500/20 text-red-400 rounded-md hover:bg-red-500/30 transition-colors"
+                onclick="this.parentElement.remove(); updatePreview();">
+          ×
+        </button>
+      `;
+      
+      container.appendChild(div);
+    }
+    
+    // Edit a project
+    function editProject(projectId) {
+      const project = projects.find(p => p.id === projectId);
+      if (!project) return;
+      
+      currentProjectId = project.id;
+      
+      // Fill the form
+      document.getElementById('project-title').value = project.title;
+      document.getElementById('project-description').value = project.description;
+      document.getElementById('project-tags').value = project.tags.join(', ');
+      document.getElementById('demo-url').value = project.demoUrl !== '#' ? project.demoUrl : '';
+      document.getElementById('code-url').value = project.codeUrl !== '#' ? project.codeUrl : '';
+      
+      // Clear and add image inputs
+      const container = document.getElementById('image-inputs');
+      container.innerHTML = '';
+      project.images.forEach(image => addImageInput(image));
+      
+      // Show cancel button
+      if (cancelEditBtn) {
+        cancelEditBtn.classList.remove('hidden');
+      }
+      
+      // Scroll to form
+      document.getElementById('project-form').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    // Delete a project
+    function deleteProject(projectId) {
+      if (confirm('Are you sure you want to delete this project?')) {
+        projects = projects.filter(p => p.id !== projectId);
+        localStorage.setItem('portfolio-projects', JSON.stringify(projects));
+        renderProjectsList();
+        
+        if (currentProjectId === projectId) {
+          resetForm();
+        }
+      }
+    }
+    
+    // Reset the form
+    function resetForm() {
+      projectForm.reset();
+      currentProjectId = null;
+      
+      // Clear image inputs and add one empty one
+      const container = document.getElementById('image-inputs');
+      container.innerHTML = '';
+      addImageInput();
+      
+      // Hide cancel button
+      if (cancelEditBtn) {
+        cancelEditBtn.classList.add('hidden');
+      }
+    }
+    
+    // Render the projects list
+    function renderProjectsList() {
+      if (!projectsList) return;
+      
+      if (projects.length === 0) {
+        projectsList.innerHTML = `
+          <div class="text-center py-8 text-gray-400">
+            No projects yet. Add your first project using the form above.
+          </div>
+        `;
+        return;
+      }
+      
+      projectsList.innerHTML = projects.map(project => `
+        <div class="border-b border-gray-800 pb-4 last:border-0 last:pb-0">
+          <div class="flex justify-between items-start">
+            <div>
+              <h3 class="font-medium text-white">${project.title}</h3>
+              <p class="text-sm text-gray-400 mt-1">${project.tags.slice(0, 3).join(', ')}${project.tags.length > 3 ? '...' : ''}</p>
+            </div>
+            <div class="flex space-x-2">
+              <button onclick="editProject('${project.id}')" 
+                      class="p-1.5 text-gray-400 hover:text-white transition-colors"
+                      title="Edit">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </button>
+              <button onclick="deleteProject('${project.id}')" 
+                      class="p-1.5 text-red-400 hover:text-red-300 transition-colors"
+                      title="Delete">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    // Update the live preview
+    function updatePreview() {
+      if (!projectPreview) return;
+      
+      const title = document.getElementById('project-title')?.value || 'Project Title';
+      const description = document.getElementById('project-description')?.value || 'A brief description of the project.';
+      const tags = document.getElementById('project-tags')?.value
+        .split(',')
+        .map(tag => tag.trim())
+        .filter(tag => tag !== '') || [];
+      
+      // Get first image URL or use placeholder
+      const imageInputs = document.querySelectorAll('.image-url');
+      const images = Array.from(imageInputs).map(input => input.value.trim()).filter(url => url !== '');
+      const imageUrl = images.length > 0 ? images[0] : 'https://via.placeholder.com/800x500/1e293b/2dd4bf?text=Project+Image';
+      
+      projectPreview.innerHTML = `
+        <div class="card p-6 rounded-lg group">
+          <div class="relative rounded-xl overflow-hidden mb-4">
+            <img src="${imageUrl}" alt="${title}" 
+                 class="w-full h-48 object-cover rounded-lg">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+              <button class="px-3 py-1.5 text-sm bg-primary-600 text-white rounded-md">
+                View Project
+              </button>
+            </div>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-1">${title}</h3>
+          <p class="text-sm text-gray-400 mb-3 line-clamp-2">${description}</p>
+          <div class="flex flex-wrap gap-1.5">
+            ${tags.slice(0, 3).map(tag => `
+              <span class="skill-tag text-xs px-2 py-0.5 rounded-full">${tag}</span>
+            `).join('')}
+            ${tags.length > 3 ? `
+              <span class="skill-tag text-xs px-2 py-0.5 rounded-full">+${tags.length - 3} more</span>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }
+    
+    // Initialize the page when loaded
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
