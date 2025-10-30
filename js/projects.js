@@ -93,48 +93,62 @@ export function renderProjects() {
   projects.forEach((project, index) => {
     // Create project card
     const projectCard = document.createElement('div');
-    projectCard.className = 'w-full flex-shrink-0 px-4';
+    projectCard.className = 'project-slide w-full flex-shrink-0 px-4';
+    projectCard.style.width = '100%';
     projectCard.dataset.project = project.id;
     
     projectCard.innerHTML = `
-      <div class="card p-6 rounded-lg group">
-        <div class="relative rounded-xl overflow-hidden mb-6">
+      <div class="card p-6 rounded-lg group cursor-pointer h-full">
+        <div class="relative overflow-hidden rounded-lg mb-4 h-48">
           <img src="${project.images[0] || 'https://via.placeholder.com/800x500/1e293b/2dd4bf?text=Project+Image'}" 
                alt="${project.title}" 
-               class="w-full h-64 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity" 
-               onclick="openProjectModal(${project.id})">
-          <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
-            <button class="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition-colors" 
-                    onclick="event.stopPropagation(); openProjectModal(${project.id})">
-              View Project
+               class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+            <button class="px-4 py-2 bg-primary-500 text-white rounded-md text-sm font-medium hover:bg-primary-600 transition-colors" 
+                    onclick="event.stopPropagation(); window.openProjectModal(${project.id})">
+              View Details
             </button>
           </div>
         </div>
-        <h3 class="text-xl font-bold text-white mb-2">${project.title}</h3>
-        <p class="text-gray-400 mb-4">${project.description.substring(0, 100)}${project.description.length > 100 ? '...' : ''}</p>
+        <h3 class="text-xl font-semibold text-white mb-2">${project.title}</h3>
+        <p class="text-gray-400 text-sm mb-4 line-clamp-2">${project.description}</p>
         <div class="flex flex-wrap gap-2">
-          ${project.tags.slice(0, 3).map(tag => 
-            `<span class="skill-tag text-xs px-3 py-1 rounded-full">${tag}</span>`
-          ).join('')}
-          ${project.tags.length > 3 ? 
-            `<span class="skill-tag text-xs px-3 py-1 rounded-full">+${project.tags.length - 3} more</span>` : ''
-          }
+          ${project.tags.slice(0, 3).map(tag => `
+            <span class="text-xs px-2 py-1 bg-dark-700 text-gray-300 rounded">${tag}</span>
+          `).join('')}
+          ${project.tags.length > 3 ? `<span class="text-xs px-2 py-1 bg-dark-700 text-gray-500 rounded">+${project.tags.length - 3} more</span>` : ''}
         </div>
       </div>
     `;
     
+    // Add click handler to the entire card
+    projectCard.addEventListener('click', (e) => {
+      // Only trigger if the click wasn't on a button or link
+      if (!e.target.closest('button, a')) {
+        if (window.openProjectModal) {
+          window.openProjectModal(project.id);
+        }
+      }
+    });
+    
     sliderTrack.appendChild(projectCard);
     
-    // Create slider dot
+    // Create dot for this project
     const dot = document.createElement('button');
-    dot.className = `w-3 h-3 rounded-full ${index === 0 ? 'bg-primary-500' : 'bg-gray-600'}`;
-    dot.addEventListener('click', () => goToSlide(index));
+    dot.className = `w-3 h-3 rounded-full mx-1 transition-all ${index === 0 ? 'bg-primary-500 w-6' : 'bg-gray-600'}`;
+    dot.ariaLabel = `Go to slide ${index + 1}`;
+    dot.addEventListener('click', (e) => {
+      e.stopPropagation();
+      currentSlide = index;
+      updateSlider();
+    });
     sliderDots.appendChild(dot);
   });
   
-  // Update slider state
-  currentSlide = 0;
-  updateSlider();
+  // Initialize or update slider after projects are rendered
+  if (typeof initSlider === 'function') {
+    initSlider();
+  }
 }
 
 // Initialize the projects when the DOM is loaded
