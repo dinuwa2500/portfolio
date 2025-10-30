@@ -1,105 +1,43 @@
-// projects.js - Centralized project management for your portfolio
+// projects.js (root) - Featured Projects slider and modal
 
-// Global variables
-let currentSlide = 0;
-
-// Project data structure
+// Data API: Edit this array to manage your projects
 export const projects = [
   {
     id: 1,
-    title: "Project 1",
-    description:
-      "A brief description of Project 1 and its key features. This project showcases my skills in web development and design.",
-    tags: ["React", "Node.js", "MongoDB", "Tailwind CSS"],
+    title: 'Project 1',
+    description: 'A brief description of Project 1 showcasing key features and impact.',
+    tags: ['React', 'Node.js', 'Tailwind'],
     images: [
-      "https://res.cloudinary.com/dinuwapvt/image/upload/v1761806358/Lucid_Origin_A_vibrant_2D_cartoon_mascot_character_in_the_styl_3_fpdkfw.jpg",
-      "https://res.cloudinary.com/dinuwapvt/image/upload/v1761806358/Lucid_Origin_A_vibrant_2D_cartoon_mascot_character_in_the_styl_3_fpdkfw.jpg",
+      'https://via.placeholder.com/1200x720/0b132b/e0fbfc?text=Project+1+Cover',
+      'https://via.placeholder.com/1200x720/1c2541/e0fbfc?text=Project+1+Screen+2',
+      'https://via.placeholder.com/1200x720/3a506b/e0fbfc?text=Project+1+Screen+3',
     ],
-    demoUrl: "#",
-    codeUrl: "#",
+    demoUrl: '#',
+    codeUrl: '#',
   },
   {
     id: 2,
-    title: "Project 2",
-    description:
-      "A brief description of Project 2 and its key features. This project demonstrates my ability to create responsive and interactive web applications.",
-    tags: ["Vue.js", "Express", "PostgreSQL", "Tailwind CSS"],
+    title: 'Project 2',
+    description: 'An elegant, responsive web app demonstrating great UX.',
+    tags: ['Vue', 'Express', 'Postgres'],
     images: [
-      "https://res.cloudinary.com/dinuwapvt/image/upload/v1761806358/Lucid_Origin_A_vibrant_2D_cartoon_mascot_character_in_the_styl_3_fpdkfw.jpg",
-      "https://res.cloudinary.com/dinuwapvt/image/upload/v1761806358/Lucid_Origin_A_vibrant_2D_cartoon_mascot_character_in_the_styl_3_fpdkfw.jpg",
-      "https://res.cloudinary.com/dinuwapvt/image/upload/v1761806358/Lucid_Origin_A_vibrant_2D_cartoon_mascot_character_in_the_styl_3_fpdkfw.jpg",
+      'https://via.placeholder.com/1200x720/003049/e0fbfc?text=Project+2+Cover',
+      'https://via.placeholder.com/1200x720/d62828/e0fbfc?text=Project+2+Screen+2'
     ],
-    demoUrl: "#",
-    codeUrl: "#",
-  },
-  // Add more projects here as you complete them
-  {
-    id: 3,
-    title: "Project 3",
-    description:
-      "A brief description of Project 2 and its key features. This project demonstrates my ability to create responsive and interactive web applications.",
-    tags: ["Vue.js", "Express", "PostgreSQL", "Tailwind CSS"],
-    images: [
-      "https://res.cloudinary.com/dinuwapvt/image/upload/v1761806358/Lucid_Origin_A_vibrant_2D_cartoon_mascot_character_in_the_styl_3_fpdkfw.jpg",
-      "https://res.cloudinary.com/dinuwapvt/image/upload/v1761806358/Lucid_Origin_A_vibrant_2D_cartoon_mascot_character_in_the_styl_3_fpdkfw.jpg",
-      "https://res.cloudinary.com/dinuwapvt/image/upload/v1761806358/Lucid_Origin_A_vibrant_2D_cartoon_mascot_character_in_the_styl_3_fpdkfw.jpg",
-    ],
-    demoUrl: "#",
-    codeUrl: "#",
+    demoUrl: '#',
+    codeUrl: '#',
   },
 ];
 
-// Function to add a new project
-export function addProject(project) {
-  // Auto-increment the ID
-  const newId =
-    projects.length > 0 ? Math.max(...projects.map((p) => p.id)) + 1 : 1;
+// Optional CRUD helpers
+export const getAllProjects = () => [...projects];
+export const getProject = (id) => projects.find(p => String(p.id) === String(id)) || null;
+export const addProject = (p) => { const id = Date.now(); projects.push({ id, ...p }); return id; };
+export const updateProject = (id, updates) => { const i = projects.findIndex(p=>String(p.id)===String(id)); if(i>-1){ projects[i] = { ...projects[i], ...updates }; return true;} return false; };
+export const removeProject = (id) => { const i = projects.findIndex(p=>String(p.id)===String(id)); if(i>-1){ projects.splice(i,1); return true;} return false; };
 
-  const newProject = {
-    id: newId,
-    title: project.title || `Project ${newId}`,
-    description: project.description || "No description provided.",
-    tags: Array.isArray(project.tags) ? project.tags : [],
-    images: Array.isArray(project.images) ? project.images : [],
-    demoUrl: project.demoUrl || "#",
-    codeUrl: project.codeUrl || "#",
-  };
-
-  projects.push(newProject);
-  return newProject;
-}
-
-// Function to update an existing project
-export function updateProject(id, updates) {
-  const index = projects.findIndex((p) => p.id === id);
-  if (index === -1) return null;
-
-  projects[index] = { ...projects[index], ...updates };
-  return projects[index];
-}
-
-// Function to remove a project
-export function removeProject(id) {
-  const index = projects.findIndex((p) => p.id === id);
-  if (index === -1) return false;
-
-  projects.splice(index, 1);
-  return true;
-}
-
-// Function to get a project by ID
-export function getProject(id) {
-  return projects.find((p) => p.id === id) || null;
-}
-
-// Function to get all projects
-export function getAllProjects() {
-  return [...projects];
-}
-
-
-// Featured projects slider and modal
-export function renderFeaturedProjects() {
+// Initialize the featured slider and modal
+export function initFeaturedProjects() {
   const list = getAllProjects();
   const track = document.getElementById('project-slider-track');
   const dots = document.getElementById('slider-dots');
@@ -108,11 +46,10 @@ export function renderFeaturedProjects() {
 
   if (!track || !dots) return;
 
-  // Clear
+  // Build slides
   track.innerHTML = '';
   dots.innerHTML = '';
 
-  // Build slides
   list.forEach((project, index) => {
     const slide = document.createElement('div');
     slide.className = 'project-slide w-full flex-shrink-0 px-4';
@@ -231,7 +168,7 @@ export function openProjectModal(projectId) {
 
   const renderImages = () => {
     imagesEl.innerHTML = '';
-    project.images?.forEach((src, i) => {
+    (project.images||[]).forEach((src, i) => {
       const img = document.createElement('img');
       img.src = src;
       img.alt = `${project.title} - Image ${i+1}`;
@@ -252,10 +189,6 @@ export function openProjectModal(projectId) {
     });
   };
 
-  renderImages();
-  updateIndicators();
-
-  // Prev/Next helpers and buttons
   const goPrev = () => { imgIndex = (imgIndex - 1 + (project.images?.length||1)) % (project.images?.length||1); renderImages(); updateIndicators(); };
   const goNext = () => { imgIndex = (imgIndex + 1) % (project.images?.length||1); renderImages(); updateIndicators(); };
 
@@ -272,21 +205,37 @@ export function openProjectModal(projectId) {
   nextBtn.className = 'absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/75 focus:outline-none focus:ring-2 focus:ring-white/60';
   nextBtn.onclick = (e) => { e.stopPropagation(); goNext(); };
 
+  renderImages();
+  updateIndicators();
   imagesEl.appendChild(prevBtn);
   imagesEl.appendChild(nextBtn);
   imagesEl.appendChild(indicators);
 
-  // Show modal
+  // Show modal + Focus Trap
   const previouslyFocused = document.activeElement;
   modal.classList.remove('hidden');
   document.body.style.overflow = 'hidden';
 
-  // Focus trap
   const getFocusable = () => Array.from(modal.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'));
-  const focusables = getFocusable();
-  const first = focusables[0] || closeBtn || modal;
-  const last = focusables[focusables.length - 1] || closeBtn || modal;
-  setTimeout(() => { (closeBtn || first).focus?.(); }, 0);
+  const keyHandler = (e) => {
+    if (e.key === 'Escape') { e.preventDefault(); close(); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); goNext(); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); goPrev(); }
+    else if (e.key === 'Tab') {
+      const f = getFocusable();
+      if (f.length === 0) { e.preventDefault(); return; }
+      const firstEl = f[0];
+      const lastEl = f[f.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === firstEl || document.activeElement === modal) { e.preventDefault(); lastEl.focus(); }
+      } else {
+        if (document.activeElement === lastEl) { e.preventDefault(); firstEl.focus(); }
+      }
+    }
+  };
+
+  const closeBtnEl = closeBtn || modal.querySelector('#close-modal');
+  setTimeout(() => { closeBtnEl?.focus?.(); }, 0);
 
   const close = () => {
     modal.classList.add('hidden');
@@ -300,28 +249,5 @@ export function openProjectModal(projectId) {
 
   if (closeBtn) closeBtn.onclick = close;
   modal.onclick = (e) => { if (e.target === modal) close(); };
-
-  const keyHandler = (e) => {
-    if (e.key === 'Escape') { e.preventDefault(); close(); return; }
-    if (e.key === 'ArrowRight') { e.preventDefault(); goNext(); return; }
-    if (e.key === 'ArrowLeft') { e.preventDefault(); goPrev(); return; }
-    if (e.key === 'Tab') {
-      const f = getFocusable();
-      if (f.length === 0) { e.preventDefault(); return; }
-      const firstEl = f[0];
-      const lastEl = f[f.length - 1];
-      if (e.shiftKey) {
-        if (document.activeElement === firstEl || document.activeElement === modal) {
-          e.preventDefault();
-          lastEl.focus();
-        }
-      } else {
-        if (document.activeElement === lastEl) {
-          e.preventDefault();
-          firstEl.focus();
-        }
-      }
-    }
-  };
   document.addEventListener('keydown', keyHandler);
 }

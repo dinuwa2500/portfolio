@@ -170,8 +170,8 @@
 
   <!-- Project Management Script -->
   <script type="module">
-    // Import project management functions
-    import { getProject, getAllProjects, renderFeaturedProjects, openProjectModal } from './js/projects.js';
+    // Import project management functions (root-level)
+    import { initFeaturedProjects } from './projects.js';
     
     // Project Slider
     const sliderTrack = document.getElementById('project-slider-track');
@@ -183,202 +183,30 @@
     let currentSlide = 0;
     
     // Make these available globally
-    window.getProject = getProject;
-    window.getAllProjects = getAllProjects;
+    // No global exposures needed
     
-    // Initialize slider
-    function initSlider() {
-      const projects = getAllProjects();
-      if (!projects.length) return;
-      
-      // Get navigation buttons
-      const prevBtn = document.getElementById('prev-project');
-      const nextBtn = document.getElementById('next-project');
-      
-      // Set slider track width
-      if (sliderTrack) {
-        sliderTrack.style.width = `${projects.length * 100}%`;
-      }
-      
-      // Add event listeners for navigation
-      if (prevBtn) {
-        prevBtn.addEventListener('click', () => {
-          if (currentSlide > 0) {
-            currentSlide--;
-            updateSlider();
-          }
-        });
-      }
-      
-      if (nextBtn) {
-        nextBtn.addEventListener('click', () => {
-          if (currentSlide < projects.length - 1) {
-            currentSlide++;
-            updateSlider();
-          }
-        });
-      }
-      
-      // Add dots for navigation
-      if (sliderDots) {
-        sliderDots.innerHTML = '';
-        projects.forEach((_, index) => {
-          const dot = document.createElement('button');
-          dot.className = `w-3 h-3 rounded-full mx-1 transition-all ${index === 0 ? 'bg-primary-500 w-6' : 'bg-gray-600'}`;
-          dot.ariaLabel = `Go to slide ${index + 1}`;
-          dot.addEventListener('click', () => {
-            currentSlide = index;
-            updateSlider();
-          });
-          sliderDots.appendChild(dot);
-        });
-      }
-      
-      updateSlider();
-    }
+    // Initialize slider (legacy neutralized)
+    const initSlider = () => {};
     
-    function updateSlider() {
-      if (!sliderTrack) return;
-      const projects = getAllProjects();
-      if (!projects.length) return;
-      
-      // Calculate the translateX value
-      const slideWidth = 100 / projects.length;
-      const translateX = -currentSlide * slideWidth;
-      
-      // Apply the transform with smooth transition
-      sliderTrack.style.transition = 'transform 0.3s ease-in-out';
-      sliderTrack.style.transform = `translateX(${translateX}%)`;
-      
-      // Update active dot
-      if (sliderDots) {
-        const dots = sliderDots.querySelectorAll('button');
-        dots.forEach((dot, index) => {
-          if (index === currentSlide) {
-            dot.classList.remove('bg-gray-600', 'w-3');
-            dot.classList.add('bg-primary-500', 'w-6');
-          } else {
-            dot.classList.remove('bg-primary-500', 'w-6');
-            dot.classList.add('bg-gray-600', 'w-3');
-          }
-        });
-      }
-      
-      // Update button states
-      const prevBtn = document.getElementById('prev-project');
-      const nextBtn = document.getElementById('next-project');
-      
-      if (prevBtn) {
-        prevBtn.disabled = currentSlide === 0;
-        prevBtn.classList.toggle('opacity-50', currentSlide === 0);
-        prevBtn.classList.toggle('cursor-not-allowed', currentSlide === 0);
-      }
-      
-      if (nextBtn) {
-        nextBtn.disabled = currentSlide === projects.length - 1;
-        nextBtn.classList.toggle('opacity-50', currentSlide === projects.length - 1);
-        nextBtn.classList.toggle('cursor-not-allowed', currentSlide === projects.length - 1);
-      }
-    }
+    const updateSlider = () => {};
     
-    // Make updateSlider globally available
-    window.updateSlider = updateSlider;
-    window.initSlider = initSlider;
+    // Remove legacy global exposures
     
     // Initialize featured projects when the page loads
     document.addEventListener('DOMContentLoaded', () => {
-      renderFeaturedProjects();
-      
-      // If we have projects, update the slider to show the first one
-      const projects = getAllProjects();
-      if (projects.length > 0) {
-        // no-op: renderFeaturedProjects handles initial slide
-      }
+      initFeaturedProjects();
     });
     
-    // Make functions globally available for HTML onclick handlers
-    window.currentProject = null;
-    window.currentImageIndex = 0;
-    
-    function updateImageNavigation() {
-      if (!window.currentProject) return;
-      
-      const projectImages = document.getElementById('project-images');
-      const imageDots = document.getElementById('image-dots');
-      
-      if (!projectImages || !imageDots) return;
-      
-      // Update main image
-      projectImages.innerHTML = `
-        <img src="${window.currentProject.images[window.currentImageIndex]}" 
-             alt="${window.currentProject.title}" 
-             class="w-full h-auto max-h-[60vh] object-contain rounded-lg">
-      `;
-      
-      // Update dots
-      imageDots.innerHTML = window.currentProject.images.map((_, index) => `
-        <button class="w-3 h-3 rounded-full mx-1 transition-all ${index === window.currentImageIndex ? 'bg-primary-500 w-6' : 'bg-gray-600'}"
-                onclick="window.currentImageIndex = ${index}; updateImageNavigation();"></button>
-      `).join('');
-    }
+    // Legacy image navigation neutralized
+    const updateImageNavigation = () => {};
     
     
-    // Initialize project slider
-    function initProjectSlider() {
-      // Create dots for project slider
-      sliderDots.innerHTML = '';
-      const projectSlides = document.querySelectorAll('[data-project]');
-      
-      projectSlides.forEach((_, index) => {
-        const dot = document.createElement('button');
-        dot.className = `w-3 h-3 rounded-full ${index === 0 ? 'bg-primary-500' : 'bg-gray-600'}`;
-        dot.addEventListener('click', () => goToSlide(index));
-        sliderDots.appendChild(dot);
-      });
-      
-      // Set initial slide
-      updateSlider();
-    }
+    const initProjectSlider = () => {};
     
-    // Go to specific slide
-    function goToSlide(index) {
-      const projectSlides = document.querySelectorAll('[data-project]');
-      if (index >= 0 && index < projectSlides.length) {
-        currentSlide = index;
-        updateSlider();
-      }
-    }
+    const goToSlide = () => {};
     
     
-    // Open project modal (legacy, renamed to avoid conflicts)
-    function legacyOpenProjectModal(projectId) {
-      currentProject = projects.find(p => p.id === projectId);
-      if (!currentProject) return;
-      
-      // Set project details
-      modalProjectTitle.textContent = currentProject.title;
-      modalProjectDescription.textContent = currentProject.description;
-      
-      // Set project tags
-      modalProjectTags.innerHTML = '';
-      currentProject.tags.forEach(tag => {
-        const tagElement = document.createElement('span');
-        tagElement.className = 'skill-tag text-xs px-3 py-1 rounded-full';
-        tagElement.textContent = tag;
-        modalProjectTags.appendChild(tagElement);
-      });
-      
-      // Set project links
-      liveDemoBtn.href = currentProject.demoUrl;
-      viewCodeBtn.href = currentProject.codeUrl;
-      
-      // Load project images
-      loadProjectImages();
-      
-      // Show modal
-      projectModal.classList.remove('invisible', 'opacity-0');
-      document.body.style.overflow = 'hidden';
-    }
+    const legacyOpenProjectModal = () => {};
     
     // Close project modal
     function closeProjectModal() {
@@ -387,50 +215,11 @@
       currentImageIndex = 0;
     }
     
-    // Load project images into modal
-    function loadProjectImages() {
-      if (!currentProject) return;
-      
-      projectImages.innerHTML = '';
-      imageDots.innerHTML = '';
-      
-      currentProject.images.forEach((image, index) => {
-        // Add image
-        const img = document.createElement('div');
-        img.className = 'w-full h-full flex-shrink-0';
-        img.innerHTML = `<img src="${image}" alt="${currentProject.title} ${index + 1}" class="w-full h-full object-contain">`;
-        projectImages.appendChild(img);
-        
-        // Add dot
-        const dot = document.createElement('button');
-        dot.className = `w-3 h-3 rounded-full ${index === 0 ? 'bg-primary-500' : 'bg-gray-600'}`;
-        dot.addEventListener('click', () => goToImage(index));
-        imageDots.appendChild(dot);
-      });
-      
-      // Reset image index
-      currentImageIndex = 0;
-      updateImageSlider();
-    }
+    const loadProjectImages = () => {};
     
-    // Go to specific image
-    function goToImage(index) {
-      if (index >= 0 && index < currentProject.images.length) {
-        currentImageIndex = index;
-        updateImageSlider();
-      }
-    }
+    const goToImage = () => {};
     
-    // Update image slider position
-    function updateImageSlider() {
-      projectImages.style.transform = `translateX(-${currentImageIndex * 100}%)`;
-      
-      // Update active dot
-      const dots = imageDots.querySelectorAll('button');
-      dots.forEach((dot, index) => {
-        dot.className = `w-3 h-3 rounded-full ${index === currentImageIndex ? 'bg-primary-500' : 'bg-gray-600'}`;
-      });
-    }
+    const updateImageSlider = () => {};
     
     
     // Event Listeners
